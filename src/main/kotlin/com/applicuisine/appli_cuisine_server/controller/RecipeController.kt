@@ -1,6 +1,7 @@
 package com.applicuisine.appli_cuisine_server.controller
 
 import com.applicuisine.appli_cuisine_server.beans.MyException
+import com.applicuisine.appli_cuisine_server.dto.RecipeDisplayDTO
 import com.applicuisine.appli_cuisine_server.services.RecipeService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -35,7 +36,7 @@ class RecipeController(val recipeService: RecipeService) {
     fun getOneRecipe(recipeId :Int, response: HttpServletResponse):Any{
         println("/getOneRecipe")
         try {
-            return recipeService.getOneRecipeById(recipeId)
+            return recipeService.getOneRecipe(recipeId)
         }catch (e: MyException){
             println(e.errorMessage)
             response.status = 500
@@ -81,7 +82,7 @@ class RecipeController(val recipeService: RecipeService) {
     @PostMapping("/likeRecipe")
     fun likeRecipe(@RequestBody idRecipe: Int,response: HttpServletResponse,httpSession: HttpSession ): Any?{
         try {
-            return recipeService.likeRecipeFromIdRecipeAndSessionId(idRecipe,httpSession.id)
+            return recipeService.likeRecipe(idRecipe,httpSession.id)
         }catch(e:Exception){
             println(e.message)
             return e
@@ -92,8 +93,20 @@ class RecipeController(val recipeService: RecipeService) {
     fun unlikeRecipe(@RequestBody idRecipe: Int,response: HttpServletResponse,httpSession: HttpSession ): Any?
     {
         try {
-            recipeService.unlikeRecipeFromIdRecipeAndSessionId(idRecipe,httpSession.id)
+            recipeService.unlikeRecipe(idRecipe,httpSession.id)
             return ""
+        }catch(e:Exception){
+            println(e.message)
+            return e
+        }
+    }
+
+    @PostMapping("/createRecipe")
+    fun createRecipe(@RequestBody recipeToCreate : RecipeDisplayDTO, httpSession: HttpSession):Any{
+        println("/createRecipe with ")
+        try {
+            recipeService.createRecipeWithComposeAndInstructions(recipeToCreate,"test")
+            return "Recipe created"
         }catch(e:Exception){
             println(e.message)
             return e

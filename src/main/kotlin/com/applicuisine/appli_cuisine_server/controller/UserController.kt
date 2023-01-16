@@ -41,12 +41,10 @@ class UserController(val userService: UserService) {
     fun connectUser(@RequestBody userToConnect: UserEntity, response: HttpServletResponse, httpSession: HttpSession):Any{
         println("/connectUser: $userToConnect mail:${userToConnect.mail} idSession: ${httpSession.id}")
         return try{
-            val firstConnexion = userService.connectUser(userToConnect, httpSession)
-            println("first connexion: $firstConnexion")
-            firstConnexion
+            userService.connectUser(userToConnect, httpSession.id)
         }catch(e:Exception){
             e.printStackTrace()
-            response.status = 500
+            response.status = 512
             e
         }
     }

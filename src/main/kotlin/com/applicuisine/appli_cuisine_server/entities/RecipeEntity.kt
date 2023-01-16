@@ -37,5 +37,9 @@ class RecipeEntity(
 
     @Basic
     @Column(name = "image_recipe", nullable = true, length = 1000)
-    var image: String? = null
+    var image: String? = null,
+
+    @Basic
+    @Column(name = "id_user", nullable = true)
+    var idUser: Int? = null
 )

@@ -9,7 +9,7 @@ import com.applicuisine.appli_cuisine_server.repositories.ComposeRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ComposeService(val composeRepository: ComposeRepository, val instructionService: InstructionService, val favoriteService: FavoriteService) {
+class ComposeService(val composeRepository: ComposeRepository, val instructionService: InstructionService, val favoriteService: FavoriteService, val unitService: UnitService, val ingredientService: IngredientService) {
 
 
     fun getRecipeToDisplay(recipe: RecipeEntity, userEntity: UserEntity):RecipeDisplayDTO?{
@@ -23,7 +23,7 @@ class ComposeService(val composeRepository: ComposeRepository, val instructionSe
         val listInstructionDTO = instructionsToInstructionsDTO(listInstruction)
         val listIngredientDTO = composesEntityToIngredientsDTO(listComposeEntity)
 
-        recipeDisplayDTO.listIngredientDTO = listIngredientDTO
+        recipeDisplayDTO.listComposeDTO = listIngredientDTO
         recipeDisplayDTO.listInstructionDTO = listInstructionDTO
 
         return recipeDisplayDTO
@@ -48,11 +48,37 @@ class ComposeService(val composeRepository: ComposeRepository, val instructionSe
         return listInstructionDTO
     }
 
-    private fun composesEntityToIngredientsDTO(listComposeEntity: List<ComposeEntity>):MutableList<IngredientDTO>{
-        val listIngredientDTO = emptyList<IngredientDTO>().toMutableList()
+    private fun composesEntityToIngredientsDTO(listComposeEntity: List<ComposeEntity>):MutableList<ComposeDTO>{
+        val listComposeDTO = emptyList<ComposeDTO>().toMutableList()
         listComposeEntity.forEach() {
-            listIngredientDTO += it.toDTO()
+            listComposeDTO += it.toDTO()
         }
-        return listIngredientDTO
+        return listComposeDTO
+    }
+
+    fun create(composesDTO: List<ComposeDTO>, recipeEntity: RecipeEntity){
+        composesDTO.forEach { composeDTO ->
+            create(composeDTO, recipeEntity)
+        }
+    }
+
+    fun create(composeDTO: ComposeDTO, recipeEntity: RecipeEntity) {
+        if (composeDTO.ingredientName != null) {
+            val ingredientName = composeDTO.ingredientName
+            val ingredient = ingredientService.find(ingredientName)
+            if (composeDTO.unitName != null) {
+                val unitEntity = unitService.find(composeDTO.unitName)
+                val composeEntity = composeDTO.toComposeEntity(recipeEntity, unitEntity, ingredient)
+                create(composeEntity)
+            }else{
+                throw Exception("Unit name is null")
+            }
+        }else{
+            throw Exception("Ingredient name is null")
+        }
+    }
+
+    fun create(composeEntity: ComposeEntity) {
+        composeRepository.save(composeEntity)
     }
 }

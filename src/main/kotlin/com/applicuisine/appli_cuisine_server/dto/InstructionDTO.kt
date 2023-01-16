@@ -8,5 +8,12 @@ class InstructionDTO(
 )
 
 fun InstructionEntity.toDTO() = InstructionDTO(
-    instruction = this.instruction
+    instruction = instruction
+)
+
+fun InstructionDTO.toEntity(idRecipe: Int, order:Int) = InstructionEntity(
+    id = null,
+    instruction = instruction,
+    order = order,
+    idRecipe = idRecipe
 )

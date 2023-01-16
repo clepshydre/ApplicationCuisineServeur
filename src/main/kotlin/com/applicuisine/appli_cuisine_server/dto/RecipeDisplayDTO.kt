@@ -24,7 +24,7 @@ class RecipeDisplayDTO (
 
     var like:Boolean? = null,
 
-    var listIngredientDTO: List<IngredientDTO> = emptyList(),
+    var listComposeDTO: List<ComposeDTO> = emptyList(),
 
     var listInstructionDTO: List<InstructionDTO> = emptyList()
 )
@@ -37,6 +37,17 @@ fun RecipeEntity.toDisplayDTO() = RecipeDisplayDTO(
     waitingTime = waitingTime,
     difficulty = difficulty,
     totalTime = preparationTime!!+cookingTime!!+waitingTime!!,
+    cost = cost,
+    image = image
+)
+
+fun RecipeDisplayDTO.toEntity() = RecipeEntity(
+    id = id,
+    name = name,
+    preparationTime = preparationTime,
+    cookingTime = cookingTime,
+    waitingTime = waitingTime,
+    difficulty = difficulty,
     cost = cost,
     image = image
 )
