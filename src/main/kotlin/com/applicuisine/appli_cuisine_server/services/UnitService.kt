@@ -16,4 +16,8 @@ class UnitService(val unitRepository: UnitRepository) {
         }
     }
 
+    fun getAllUnits(): List<UnitEntity> {
+        return unitRepository.findAll()
+    }
+
 }

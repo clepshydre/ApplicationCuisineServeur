@@ -7,11 +7,11 @@ import com.applicuisine.appli_cuisine_server.entities.UnitEntity
 
 class ComposeDTO (
 
-    val quantity: Double? = 0.0,
+    var quantity: Double? = 0.0,
 
-    val unitName: String? = "",
+    var unitName: String? = "",
 
-    val ingredientName:String? ="",
+    var ingredientName:String? ="",
 
     )
 

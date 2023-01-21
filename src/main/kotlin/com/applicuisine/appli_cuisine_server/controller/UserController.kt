@@ -65,7 +65,7 @@ class UserController(val userService: UserService) {
     fun actualUser(httpSession: HttpSession, response: HttpServletResponse):Any{
         println("/findActualUser")
         return try {
-            userService.getActualUser(httpSession.id)
+            userService.getUser(httpSession.id)
         }catch (e:MyException) {
             println(e.errorMessage)
             response.status = 500

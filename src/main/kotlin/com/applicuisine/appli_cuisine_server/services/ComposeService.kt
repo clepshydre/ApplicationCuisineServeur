@@ -65,9 +65,9 @@ class ComposeService(val composeRepository: ComposeRepository, val instructionSe
     fun create(composeDTO: ComposeDTO, recipeEntity: RecipeEntity) {
         if (composeDTO.ingredientName != null) {
             val ingredientName = composeDTO.ingredientName
-            val ingredient = ingredientService.find(ingredientName)
+            val ingredient = ingredientService.find(ingredientName!!)
             if (composeDTO.unitName != null) {
-                val unitEntity = unitService.find(composeDTO.unitName)
+                val unitEntity = unitService.find(composeDTO.unitName!!)
                 val composeEntity = composeDTO.toComposeEntity(recipeEntity, unitEntity, ingredient)
                 create(composeEntity)
             }else{

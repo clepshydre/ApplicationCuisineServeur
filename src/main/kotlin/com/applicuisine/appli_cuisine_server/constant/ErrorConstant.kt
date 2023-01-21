@@ -1,4 +1,4 @@
-package com.applicuisine.appli_cuisine_server.utils
+package com.applicuisine.appli_cuisine_server.constant
 
 const val ERROR_MESSAGE_INVALID_MAIL ="Votre adresse mail n'est pas valide"
 

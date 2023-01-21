@@ -27,7 +27,7 @@ class RecipeService(val recipeRepository: RecipeRepository, val composeService: 
         val recipe = recipeRepository.findById(idRecipe)
         if (recipe.isPresent) {
             println("Recipe present")
-            val userEntity = userService.getActualUser(sessionId)
+            val userEntity = userService.getUser(sessionId)
             return composeService.getRecipeToDisplay(recipe.get(),userEntity)
         }else{
             throw Exception("Recipe not found")
@@ -35,7 +35,7 @@ class RecipeService(val recipeRepository: RecipeRepository, val composeService: 
     }
 
     fun getFavoriteRecipesFromIdSession(idSession: String):List<RecipeEntity> {
-        val user = userService.getActualUser(idSession)
+        val user = userService.getUser(idSession)
         val listFavoritesEntity = favoriteService.getFavoriteRecipeByUserEntity(user)
         return favoritesToRecipesEntity(listFavoritesEntity)
     }
@@ -68,13 +68,13 @@ class RecipeService(val recipeRepository: RecipeRepository, val composeService: 
     }
 
     fun likeRecipe(idRecipe: Int, idSession: String) {
-        val user = userService.getActualUser(idSession)
+        val user = userService.getUser(idSession)
         val recipe = recipeRepository.getReferenceById(idRecipe)
         favoriteService.likeRecipe(user,recipe)
     }
 
     fun unlikeRecipe(idRecipe: Int, idSession: String) {
-        val user = userService.getActualUser(idSession)
+        val user = userService.getUser(idSession)
         val recipe = recipeRepository.getReferenceById(idRecipe)
         favoriteService.unlikeRecipe(user,recipe)
     }
@@ -95,14 +95,13 @@ class RecipeService(val recipeRepository: RecipeRepository, val composeService: 
             //Create Recipe
             var recipeEntity = recipeToCreate.toEntity()
             recipeEntity = create(sessionId,recipeEntity)
-
-            //Create compose
-            val composesDTO = recipeToCreate.listComposeDTO
-            composeService.create(composesDTO, recipeEntity)
-
-            //Create instruction
-            val instructionsDTO = recipeToCreate.listInstructionDTO
             if(recipeEntity.id != null) {
+                //Create compose
+                val composesDTO = recipeToCreate.listComposeDTO
+                composeService.create(composesDTO, recipeEntity)
+
+                //Create instruction
+                val instructionsDTO = recipeToCreate.listInstructionDTO
                 instructionService.create(instructionsDTO, recipeEntity.id!!)
             }else{
                 throw Exception("Recipe Entity id is null")
@@ -113,8 +112,45 @@ class RecipeService(val recipeRepository: RecipeRepository, val composeService: 
     }
 
     fun create(sessionId:String, recipe:RecipeEntity): RecipeEntity {
-            val user =  userService.getActualUser(sessionId)
-            recipe.idUser = user.id
-            return recipeRepository.save(recipe)
+        verifyRecipeToCreate(recipe)
+        val user = userService.getUser(sessionId)
+        recipe.idUser = user.id
+        return recipeRepository.save(recipe)
+    }
+
+    private fun verifyRecipeToCreate(recipe: RecipeEntity){
+        if(!recipe.name.isNullOrEmpty()) {
+            if(recipe.cookingTime !=null) {
+                if(recipe.preparationTime != null) {
+                    if(recipe.waitingTime != null) {
+                        if(recipe.cost != null) {
+                            if(recipe.cost!! in 1..3) {
+                                if(recipe.difficulty != null) {
+                                    if(recipe.difficulty!! in 1..3) {
+
+                                    }else{
+                                        throw Exception("Difficulty isn't in range 1 to 3")
+                                    }
+                                }else{
+                                    throw Exception("Difficulty is null")
+                                }
+                            }else{
+                                throw Exception("Cost is not in range 1 to 3")
+                            }
+                        }else{
+                            throw Exception("Cost is null")
+                        }
+                    }else{
+                        throw Exception("Waiting Time is null")
+                    }
+                }else{
+                    throw Exception("Cooking time is null")
+                }
+            }else{
+                throw Exception("Preparation time is null")
+            }
+        }else{
+            throw Exception("name is null or empty")
+        }
     }
 }

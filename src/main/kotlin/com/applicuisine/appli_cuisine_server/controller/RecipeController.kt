@@ -2,6 +2,7 @@ package com.applicuisine.appli_cuisine_server.controller
 
 import com.applicuisine.appli_cuisine_server.beans.MyException
 import com.applicuisine.appli_cuisine_server.dto.RecipeDisplayDTO
+import com.applicuisine.appli_cuisine_server.entities.IngredientEntity
 import com.applicuisine.appli_cuisine_server.services.RecipeService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -103,13 +104,13 @@ class RecipeController(val recipeService: RecipeService) {
 
     @PostMapping("/createRecipe")
     fun createRecipe(@RequestBody recipeToCreate : RecipeDisplayDTO, httpSession: HttpSession):Any{
-        println("/createRecipe with ")
         try {
-            recipeService.createRecipeWithComposeAndInstructions(recipeToCreate,"test")
+            recipeService.createRecipeWithComposeAndInstructions(recipeToCreate,httpSession.id)
             return "Recipe created"
         }catch(e:Exception){
             println(e.message)
             return e
         }
     }
+
 }

@@ -15,4 +15,8 @@ class IngredientService(val ingredientRepository: IngredientRepository) {
             throw Exception("Ingredient couldn't be find with this name: $name")
         }
     }
+
+    fun getAllIngredients(): List<IngredientEntity> {
+        return ingredientRepository.findAll()
+    }
 }

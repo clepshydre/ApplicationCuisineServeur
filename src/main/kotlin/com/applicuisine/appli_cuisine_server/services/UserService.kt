@@ -1,13 +1,12 @@
 package com.applicuisine.appli_cuisine_server.services
 
 import com.applicuisine.appli_cuisine_server.beans.MyException
+import com.applicuisine.appli_cuisine_server.constant.*
 import com.applicuisine.appli_cuisine_server.dto.PasswordDTO
 import com.applicuisine.appli_cuisine_server.entities.UserEntity
 import com.applicuisine.appli_cuisine_server.repositories.UserRepository
 import com.applicuisine.appli_cuisine_server.utils.*
-import jakarta.servlet.http.HttpSession
 import org.springframework.stereotype.Service
-import java.util.regex.Pattern
 
 @Service
 class UserService(val userRepository: UserRepository) {
@@ -35,38 +34,6 @@ class UserService(val userRepository: UserRepository) {
         }
     }
 
-    fun find(mail:String, password:String):UserEntity{
-        val userOptional = userRepository.findUserEntityByMailAndPassword(mail,password)
-        if(userOptional.isPresent) {
-            return userOptional.get()
-        }else{
-            throw Exception(ERROR_MESSAGE_USER_NOT_FOUND)
-        }
-    }
-
-    fun saveNewSessionIdToUser(user: UserEntity, sessionId: String){
-        user.sessionId = sessionId
-        userRepository.save(user)
-    }
-
-    fun updateUser(sessionId: String, userToUpdate: UserEntity){
-        val actualUser = getActualUser(sessionId)
-        actualUser.dateOfBirth = userToUpdate.dateOfBirth
-        actualUser.sex = userToUpdate.sex
-        actualUser.budget = userToUpdate.budget
-        actualUser.cuisineLevel = userToUpdate.cuisineLevel
-        userRepository.save(actualUser)
-    }
-
-    fun getActualUser(sessionId: String): UserEntity {
-        val actualUser = userRepository.findUserEntityBySessionId(sessionId)
-        if(actualUser.isPresent){
-            return actualUser.get()
-        }else{
-            throw MyException(ERROR_GENERAL_MESSAGE, MyException.ERROR_GENERAL_WELCOME)
-        }
-    }
-
     private fun verifyLogin(userToVerify: UserEntity):Boolean {
         return if(!userToVerify.mail.isNullOrBlank() && !userToVerify.password.isNullOrBlank()){
             if(userToVerify.mail!!.isMailValid()) {
@@ -76,12 +43,47 @@ class UserService(val userRepository: UserRepository) {
                     throw MyException(ERROR_MESSAGE_INVALID_PASSWORD, MyException.ERROR_PASSWORD)
                 }
             }else {
-                throw MyException(ERROR_MESSAGE_INVALID_MAIL, MyException.ERROR_PASSWORD)
+                throw MyException(ERROR_MESSAGE_INVALID_MAIL, MyException.ERROR_MAIL)
             }
         }else {
             false
         }
     }
+
+    fun find(mail:String, password:String):UserEntity{
+        val userOptional = userRepository.findUserEntityByMailAndPassword(mail,password)
+        if(userOptional.isPresent) {
+            return userOptional.get()
+        }else{
+            throw MyException(ERROR_MESSAGE_PASSWORD_MAIL_MATCH, MyException.ERROR_GENERAL_WELCOME)
+        }
+    }
+
+    fun saveNewSessionIdToUser(user: UserEntity, sessionId: String){
+        user.sessionId = sessionId
+        userRepository.save(user)
+    }
+
+    fun updateUser(sessionId: String, userToUpdate: UserEntity){
+        val actualUser = getUser(sessionId)
+        actualUser.dateOfBirth = userToUpdate.dateOfBirth
+        actualUser.sex = userToUpdate.sex
+        actualUser.budget = userToUpdate.budget
+        actualUser.cuisineLevel = userToUpdate.cuisineLevel
+        userRepository.save(actualUser)
+    }
+
+    fun getUser(sessionId: String): UserEntity {
+        val actualUser = userRepository.findUserEntityBySessionId(sessionId)
+        if(actualUser.isPresent){
+            return actualUser.get()
+        }else{
+            println("pb actual user with $sessionId")
+            throw MyException(ERROR_GENERAL_MESSAGE, MyException.ERROR_GENERAL_WELCOME)
+        }
+    }
+
+
 
     fun modifyPassword(sessionId: String, passwordDTO: PasswordDTO):Boolean{
         var successful = false
